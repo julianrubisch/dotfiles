@@ -128,6 +128,9 @@ nmap <silent> t<C-s> :TestSuite<CR>
 nmap <silent> t<C-l> :TestLast<CR>
 nmap <silent> t<C-g> :TestVisit<CR>
 
+nmap <leader>vr :sp $MYVIMRC<cr>
+nmap <leader>so :source $MYVIMRC<cr>
+imap <C-s> <esc>:w<cr>
 
 " python3 from powerline.vim import setup as powerline_setup
 " python3 powerline_setup()
