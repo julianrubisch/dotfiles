@@ -16,6 +16,7 @@ Plug 'kana/vim-textobj-user'
 Plug 'nelstrom/vim-textobj-rubyblock'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-endwise'
 
 Plug 'tpope/vim-rails'
 Plug 'tpope/vim-bundler'
@@ -53,8 +54,16 @@ Plug 'dracula/vim', { 'as': 'dracula' }
 Plug 'cocopon/iceberg.vim'
 Plug 'joshdick/onedark.vim'
 
+" Dev Icons
 Plug 'ryanoasis/vim-devicons'
 Plug 'sheerun/vim-polyglot'
+
+" Testing
+Plug 'junegunn/vader.vim'
+
+" Fuzzy File Finding
+Plug '/usr/local/opt/fzf'
+Plug 'junegunn/fzf.vim'
 call plug#end()
 
 
@@ -90,12 +99,19 @@ hi StatusLine ctermbg=3 ctermfg=Black
 let g:rspec_command = "!bin/rspec {spec}"
 
 let g:LanguageClient_autoStop = 0
+let g:LanguageClient_autoStart = 1
 let g:LanguageClient_serverCommands = {
+    \ 'css': ['css-languageserver', '--stdio'],
+    \ 'scss': ['css-languageserver', '--stdio'],
+    \ 'sass': ['css-languageserver', '--stdio'],
+    \ 'less': ['css-languageserver', '--stdio'],
+    \ 'html': ['html-languageserver', '--stdio'],
     \ 'javascript': ['javascript-typescript-stdio'],
     \ 'javascript.jsx': ['javascript-typescript-stdio'],
     \ 'elixir': ['~/Documents/_CODE/util/elixir-ls/bin/language_server.sh'],
-    \ 'ruby': ['tcp://localhost:7658']
+    \ 'ruby': ['solargraph', 'stdio']
     \ }
+let g:LanguageClient_windowLogMessageLevel = "Error"
 
 let g:ale_linters = {
 \   'css': ['csslint'],
@@ -178,9 +194,30 @@ function! ParallelRspecRails()
   execute '!env CAPYBARA_DRIVER=headless_chrome bin/rails parallel:spec'
 endfunction
 
+function! ProntoRails(branch)
+  execute '!bundle exec pronto run -c=' . a:branch
+endfunction
+
 nnoremap <Leader>p :call ParallelRspecRails()<CR>
+nnoremap <Leader>pr :call ProntoRails('origin/dev')<CR>
 
 let g:ctrlp_custom_ignore = {
-  \ 'dir':  '\v[\/](\.(git|hg|svn)|node_modules)$',
+  \ 'dir':  '\v[\/](\.(git|hg|svn)|node_modules|tmp)$',
   \ }
 let g:ctrlp_clear_cache_on_exit = 0
+
+" FZF mappings
+" Mapping selecting mappings
+nmap <leader><tab> <plug>(fzf-maps-n)
+xmap <leader><tab> <plug>(fzf-maps-x)
+omap <leader><tab> <plug>(fzf-maps-o)
+nmap <leader>f :Files<CR>
+
+" Insert mode completion
+imap <c-x><c-k> <plug>(fzf-complete-word)
+imap <c-x><c-f> <plug>(fzf-complete-path)
+imap <c-x><c-j> <plug>(fzf-complete-file-ag)
+imap <c-x><c-l> <plug>(fzf-complete-line)
+
+" commands
+command! -nargs=1 Pronto call g:ProntoRails(<f-args>)
