@@ -1,0 +1,3 @@
+" Dev Icons
+Plug 'ryanoasis/vim-devicons'
+Plug 'sheerun/vim-polyglot'

@@ -1,0 +1,5 @@
+" Themes
+Plug 'rakr/vim-two-firewatch'
+Plug 'dracula/vim', { 'as': 'dracula' }
+Plug 'cocopon/iceberg.vim'
+Plug 'joshdick/onedark.vim'

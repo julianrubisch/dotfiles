@@ -1,3 +1,4 @@
+set nocompatible
 let mapleader = ","
 
 if empty(glob('~/.vim/autoload/plug.vim'))
@@ -6,83 +7,29 @@ if empty(glob('~/.vim/autoload/plug.vim'))
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
+function! s:SourceConfigFilesIn(directory)
+  let directory_splat = '~/.vim/' . a:directory . '/*'
+  for config_file in split(glob(directory_splat), '\n')
+    if filereadable(config_file)
+      execute 'source' config_file
+    endif
+  endfor
+endfunction
+
 call plug#begin('~/.vim/plugged')
-Plug 'elixir-editors/vim-elixir'
-Plug 'tpope/vim-sensible'
-Plug 'julianrubisch/vim-rspec'
-Plug 'ctrlpvim/ctrlp.vim'
-Plug 'slim-template/vim-slim'
-Plug 'kana/vim-textobj-user'
-Plug 'nelstrom/vim-textobj-rubyblock'
-Plug 'rhysd/vim-textobj-anyblock'
-Plug 'tpope/vim-fugitive'
-Plug 'tpope/vim-commentary'
-Plug 'tpope/vim-endwise'
-
-" File browsing
-Plug 'scrooloose/nerdtree'
-
-Plug 'tpope/vim-rails'
-Plug 'tpope/vim-bundler'
-
-Plug 'autozimu/LanguageClient-neovim', {
-    \ 'branch': 'next',
-    \ 'do': 'bash install.sh',
-    \ }
-
-Plug 'w0rp/ale'
-
-Plug 'HerringtonDarkholme/yats.vim'
-Plug 'mhartington/nvim-typescript', {'do': './install.sh'}
-
-" Plug 'thinca/vim-ref'
-" Plug 'kbrw/elixir.nvim', { 'do': 'yes \| ./install.sh' }
-
-Plug 'itchyny/lightline.vim'
-
-Plug 'maximbaz/lightline-ale'
-
-Plug 'easymotion/vim-easymotion'
-Plug 'tpope/vim-surround'
-Plug 'mattn/emmet-vim'
-Plug 'ngmy/vim-rubocop'
-Plug 'janko-m/vim-test'
-Plug 'Shougo/deoplete.nvim'
-Plug 'roxma/nvim-yarp'
-Plug 'roxma/vim-hug-neovim-rpc'
-" Plug 'tbodt/deoplete-tabnine', { 'do': './install.sh' }
-
-" Themes
-Plug 'rakr/vim-two-firewatch'
-Plug 'dracula/vim', { 'as': 'dracula' }
-Plug 'cocopon/iceberg.vim'
-Plug 'joshdick/onedark.vim'
-
-" Dev Icons
-Plug 'ryanoasis/vim-devicons'
-Plug 'sheerun/vim-polyglot'
-
-" Testing
-Plug 'junegunn/vader.vim'
-
-" Fuzzy File Finding
-Plug '/usr/local/opt/fzf'
-Plug 'junegunn/fzf.vim'
-
-" Close delimiters automatically
-Plug 'Raimondi/delimitMate'
+call s:SourceConfigFilesIn('rcplugins')
 call plug#end()
 
 
-call deoplete#custom#option('complete_function', 'omnifunc')
-call deoplete#custom#source('omni', 'functions', {
-		    \ 'ruby':  'LanguageClient#complete',
-		    \ 'javascript': ['tern#Complete', 'jspc#omni', 'LanguageClient#complete']
-		    \})
-call deoplete#custom#var('omni', 'input_patterns', {
-		    \ 'ruby': ['[^. *\t]\.\w*', '[a-zA-Z_]\w*::']
-		    \})
-let g:deoplete#enable_at_startup = 1
+" call deoplete#custom#option('complete_function', 'omnifunc')
+" call deoplete#custom#source('omni', 'functions', {
+" 		    \ 'ruby':  'LanguageClient#complete',
+" 		    \ 'javascript': ['tern#Complete', 'jspc#omni', 'LanguageClient#complete']
+" 		    \})
+" call deoplete#custom#var('omni', 'input_patterns', {
+" 		    \ 'ruby': ['[^. *\t]\.\w*', '[a-zA-Z_]\w*::']
+" 		    \})
+" let g:deoplete#enable_at_startup = 1
 
 " RSpec.vim mappings
 map <Leader>t :call RunCurrentSpecFile()<CR>
@@ -105,20 +52,20 @@ hi StatusLine ctermbg=3 ctermfg=Black
 
 let g:rspec_command = "!bin/rspec {spec}"
 
-let g:LanguageClient_autoStop = 0
-let g:LanguageClient_autoStart = 1
-let g:LanguageClient_serverCommands = {
-    \ 'css': ['css-languageserver', '--stdio'],
-    \ 'scss': ['css-languageserver', '--stdio'],
-    \ 'sass': ['css-languageserver', '--stdio'],
-    \ 'less': ['css-languageserver', '--stdio'],
-    \ 'html': ['html-languageserver', '--stdio'],
-    \ 'javascript': ['javascript-typescript-stdio'],
-    \ 'javascript.jsx': ['javascript-typescript-stdio'],
-    \ 'elixir': ['~/Documents/_CODE/util/elixir-ls/bin/language_server.sh'],
-    \ 'ruby': ['solargraph', 'stdio']
-    \ }
-let g:LanguageClient_windowLogMessageLevel = "Error"
+inoremap <silent><expr> <c-space> coc#refresh()
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+" Remap for rename current word
+nmap <leader>rn <Plug>(coc-rename)
 
 let g:ale_linters = {
 \   'css': ['csslint'],
@@ -137,15 +84,6 @@ let g:ale_fixers = {
 \   'ruby': ['rubocop'],
 \   'scss': ['sasslint']
 \}
-
-nnoremap <F5> :call LanguageClient_contextMenu()<CR>
-nnoremap <silent> K :call LanguageClient#textDocument_hover()<CR>
-nnoremap <silent> gd :call LanguageClient#textDocument_definition()<CR>
-nnoremap <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
-nnoremap <buffer>
-  \ <leader>sf :call LanguageClient#textDocument_documentSymbol()<cr>
-
-" autocmd FileType ruby setlocal omnifunc=LanguageClient#complete
 
 inoremap <C-@> <C-x><C-o>
 
