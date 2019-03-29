@@ -14,9 +14,13 @@ Plug 'ctrlpvim/ctrlp.vim'
 Plug 'slim-template/vim-slim'
 Plug 'kana/vim-textobj-user'
 Plug 'nelstrom/vim-textobj-rubyblock'
+Plug 'rhysd/vim-textobj-anyblock'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-endwise'
+
+" File browsing
+Plug 'scrooloose/nerdtree'
 
 Plug 'tpope/vim-rails'
 Plug 'tpope/vim-bundler'
@@ -64,6 +68,9 @@ Plug 'junegunn/vader.vim'
 " Fuzzy File Finding
 Plug '/usr/local/opt/fzf'
 Plug 'junegunn/fzf.vim'
+
+" Close delimiters automatically
+Plug 'Raimondi/delimitMate'
 call plug#end()
 
 
@@ -121,6 +128,8 @@ let g:ale_linters = {
 \   'scss': ['sasslint']
 \}
 
+let g:ale_lint_on_text_changed = 0
+
 let g:ale_fixers = {
 \   'css': ['csslint'],
 \   'elixir': ['mix_format'],
@@ -133,6 +142,8 @@ nnoremap <F5> :call LanguageClient_contextMenu()<CR>
 nnoremap <silent> K :call LanguageClient#textDocument_hover()<CR>
 nnoremap <silent> gd :call LanguageClient#textDocument_definition()<CR>
 nnoremap <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
+nnoremap <buffer>
+  \ <leader>sf :call LanguageClient#textDocument_documentSymbol()<cr>
 
 " autocmd FileType ruby setlocal omnifunc=LanguageClient#complete
 
@@ -146,6 +157,7 @@ nmap <silent> t<C-g> :TestVisit<CR>
 
 nmap <leader>vr :sp $MYVIMRC<cr>
 nmap <leader>so :source $MYVIMRC<cr>
+nmap <leader>tc :sp ~/.tmux.conf<cr>
 imap <C-s> <esc>:w<cr>
 
 " python3 from powerline.vim import setup as powerline_setup
@@ -200,24 +212,41 @@ endfunction
 
 nnoremap <Leader>p :call ParallelRspecRails()<CR>
 nnoremap <Leader>pr :call ProntoRails('origin/dev')<CR>
+nnoremap <Leader>af ALEFix<CR>
 
-let g:ctrlp_custom_ignore = {
-  \ 'dir':  '\v[\/](\.(git|hg|svn)|node_modules|tmp)$',
-  \ }
-let g:ctrlp_clear_cache_on_exit = 0
+map <C-n> :NERDTreeToggle<CR>
+" map <C-n> f :NERDTreeFind<cr>
+
+" let g:ctrlp_custom_ignore = {
+"   \ 'dir':  '\v[\/](\.(git|hg|svn)|node_modules|tmp)$',
+"   \ }
+" let g:ctrlp_clear_cache_on_exit = 0
 
 " FZF mappings
 " Mapping selecting mappings
 nmap <leader><tab> <plug>(fzf-maps-n)
 xmap <leader><tab> <plug>(fzf-maps-x)
 omap <leader><tab> <plug>(fzf-maps-o)
-nmap <leader>f :Files<CR>
+nmap <leader>f :call fzf#run(fzf#wrap({'source': 'git ls-files --exclude-standard --others --cached'}))<CR>
 
 " Insert mode completion
 imap <c-x><c-k> <plug>(fzf-complete-word)
 imap <c-x><c-f> <plug>(fzf-complete-path)
 imap <c-x><c-j> <plug>(fzf-complete-file-ag)
 imap <c-x><c-l> <plug>(fzf-complete-line)
+
+command! -bang -nargs=* Ag
+  \ call fzf#vim#ag(<q-args>,
+  \                 <bang>0 ? fzf#vim#with_preview('up:60%')
+  \                         : fzf#vim#with_preview('right:50%:hidden', '?'),
+  \                 <bang>0)
+
+command! -bang -nargs=* Rg
+  \ call fzf#vim#grep(
+  \   'rg --column --line-number --no-heading --color=always --smart-case '.shellescape(<q-args>), 1,
+  \   <bang>0 ? fzf#vim#with_preview('up:60%')
+  \           : fzf#vim#with_preview('right:50%:hidden', '?'),
+  \   <bang>0)
 
 " commands
 command! -nargs=1 Pronto call g:ProntoRails(<f-args>)
