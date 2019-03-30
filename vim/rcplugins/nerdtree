@@ -1,2 +1,5 @@
 " File browsing
 Plug 'scrooloose/nerdtree'
+
+map <C-n> :NERDTreeToggle<CR>
+" map <C-n> f :NERDTreeFind<cr>

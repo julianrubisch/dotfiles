@@ -1,1 +1,19 @@
 Plug 'w0rp/ale'
+
+let g:ale_linters = {
+\   'css': ['csslint'],
+\   'elixir': ['mix'],
+\   'javascript': ['prettier', 'eslint'],
+\   'ruby': ['rubocop'],
+\   'scss': ['sasslint']
+\}
+
+let g:ale_lint_on_text_changed = 0
+
+let g:ale_fixers = {
+\   'css': ['csslint'],
+\   'elixir': ['mix_format'],
+\   'javascript': ['prettier', 'eslint'],
+\   'ruby': ['rubocop'],
+\   'scss': ['sasslint']
+\}
