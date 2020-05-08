@@ -18,11 +18,22 @@ endfunction
 
 call plug#begin('~/.vim/plugged')
 call s:SourceConfigFilesIn('rcplugins')
+
+if !has('nvim')
+  Plug 'rhysd/vim-healthcheck'
+endif
 call plug#end()
 
+" if (has("termguicolors"))
+"   set termguicolors
+" endif
+
+let &t_8f="\<Esc>[38;2;%lu;%lu;%lum"
+let &t_8b="\<Esc>[48;2;%lu;%lu;%lum"
+set termguicolors
 
 syntax on
-color dracula
+color night-owl
 set number
 set tabstop=2
 set shiftwidth=2
@@ -31,6 +42,8 @@ set expandtab
 set foldmethod=indent
 set foldlevel=20
 set shell=/bin/bash
+set redrawtime=10000 
+set clipboard=unnamed
 hi Visual term=reverse cterm=reverse guibg=Gray
 hi StatusLine ctermbg=3 ctermfg=Black
 
@@ -52,9 +65,17 @@ function! ProntoRails(branch)
   execute '!bundle exec pronto run -c=' . a:branch
 endfunction
 
+function! RemoveFocus()
+  execute '%s/, focus: true//g'
+endfunction
+
 nnoremap <Leader>p :call ParallelRspecRails()<CR>
 nnoremap <Leader>pr :call ProntoRails('origin/dev')<CR>
-nnoremap <Leader>af :call ALEFix<CR>
+nnoremap <Leader>af :ALEFix<CR>
+nnoremap <Leader>rg :Rg<CR>
 
 " commands
 command! -nargs=1 Pronto call g:ProntoRails(<f-args>)
+command! RemoveFocus call g:RemoveFocus()
+command! -bang -nargs=1 Be execute 'Dispatch<bang> bundle exec ' . <f-args>
+command! Bi execute 'Dispatch bundle install'

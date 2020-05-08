@@ -1,10 +1,12 @@
 Plug 'w0rp/ale'
+Plug 'antew/vim-elm-language-server'
 
 let g:ale_linters = {
 \   'css': ['csslint'],
 \   'elixir': ['mix'],
 \   'javascript': ['prettier', 'eslint'],
 \   'ruby': ['rubocop'],
+\   'rust': ['cargo clippy'],
 \   'scss': ['sasslint']
 \}
 
@@ -15,5 +17,6 @@ let g:ale_fixers = {
 \   'elixir': ['mix_format'],
 \   'javascript': ['prettier', 'eslint'],
 \   'ruby': ['rubocop'],
+\   'rust': ['rustfmt'],
 \   'scss': ['sasslint']
 \}

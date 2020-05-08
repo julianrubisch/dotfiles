@@ -1,3 +1,6 @@
 " Dev Icons
 Plug 'ryanoasis/vim-devicons'
 Plug 'sheerun/vim-polyglot'
+
+" slow as hell, override
+let g:polyglot_disabled = ['slim']
